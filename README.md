@@ -1,9 +1,10 @@
 # 🤖 Rundeck Plugin - Ollama Workflow step
 
 > A workflow step plugin that integrates [Ollama](https://ollama.ai) AI models with Rundeck for intelligent automation and analysis. **This plugin is community supported**
-> [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-> [![Rundeck](https://img.shields.io/badge/Rundeck-3.x+-orange.svg)](https://www.rundeck.com/)
-> [![Java](https://img.shields.io/badge/Java-11+-green.svg)](https://www.java.com/)
+
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Rundeck](https://img.shields.io/badge/Rundeck-3.x+-orange.svg)](https://www.rundeck.com/)
+[![Java](https://img.shields.io/badge/Java-11+-green.svg)](https://www.java.com/)
 
 ## 🌟 Features
 
@@ -107,31 +108,61 @@ By default, the plugin connects to `[http://localhost:11434](http://localhost:11
 
 ### Sample Job Definition
 
-``` yaml
-- defaultTab: nodes
-  description: Example job using OllamaAI plugin
-  executionEnabled: true
-  id: ollama-example
-  name: OllamaAI Example
-  nodeFilterEditable: false
-  plugins:
-    ExecutionLifecycle: null
-  scheduleEnabled: true
-  sequence:
-    commands:
-    - configuration:
-        model: llama3
-        prompt: "Analyze this system information:"
-        serverUrl: [http://localhost:11434](http://localhost:11434)
-        temperature: "0.7"
-        maxTokens: "1000"
-      type: ollamaai-step
-    - configuration:
-        content: "${data.ollamaai.response}"
-      type: log-data
-    keepgoing: false
-    strategy: node-first
-  uuid: ollama-example
+``` json
+[ {
+  "defaultTab" : "nodes",
+  "description" : "",
+  "executionEnabled" : true,
+  "id" : "e219e8ef-167f-4905-b0d5-50f0aa73dbb1",
+  "loglevel" : "INFO",
+  "name" : "Testing Local LLM (Ollama) Simplification of Logs",
+  "nodeFilterEditable" : false,
+  "plugins" : {
+    "ExecutionLifecycle" : {
+      "roi-metrics" : {
+        "userRoiData" : "[{\"key\":\"hours\",\"label\":\"hours\",\"value\":\"0.75\",\"desc\":\"hours saved (Field key: hours)\"}]"
+      }
+    }
+  },
+  "scheduleEnabled" : true,
+  "schedules" : [ ],
+  "sequence" : {
+    "commands" : [ {
+      "autoSecureInput" : "false",
+      "passSecureInput" : "false",
+      "plugins" : {
+        "LogFilter" : [ {
+          "config" : {
+            "captureMultipleKeysValues" : "false",
+            "hideOutput" : "false",
+            "logData" : "false",
+            "name" : "logoutput",
+            "regex" : "(.*)"
+          },
+          "type" : "key-value-data-multilines"
+        } ]
+      },
+      "script" : "#!/bin/bash\n\n# Basic health check script for AWS machine\n# Save this as health_check.sh and make it executable with: chmod +x health_check.sh\n\nLOG_FILE=\"system_health.log\"\nDATE=$(date '+%Y-%m-%d %H:%M:%S')\nHOSTNAME=$(hostname)\nIP_ADDRESS=$(hostname -I | awk '{print $1}')\n\necho \"==================================================\" >> $LOG_FILE\necho \"System Health Check: $DATE\" >> $LOG_FILE\necho \"Hostname: $HOSTNAME\" >> $LOG_FILE\necho \"IP Address: $IP_ADDRESS\" >> $LOG_FILE\necho \"==================================================\" >> $LOG_FILE\n\n# Check uptime\necho -e \"\\n--- System Uptime ---\" >> $LOG_FILE\nuptime >> $LOG_FILE\n\n# Check memory usage\necho -e \"\\n--- Memory Usage ---\" >> $LOG_FILE\nfree -h >> $LOG_FILE\n\n# Check disk usage\necho -e \"\\n--- Disk Usage ---\" >> $LOG_FILE\ndf -h | grep -v \"tmpfs\" >> $LOG_FILE\n\n# Check CPU load\necho -e \"\\n--- CPU Load ---\" >> $LOG_FILE\ntop -bn1 | head -n 20 >> $LOG_FILE\n\n# Check for high CPU processes\necho -e \"\\n--- Top 5 CPU-consuming processes ---\" >> $LOG_FILE\nps aux --sort=-%cpu | head -n 6 >> $LOG_FILE\n\n# Check for high memory processes\necho -e \"\\n--- Top 5 Memory-consuming processes ---\" >> $LOG_FILE\nps aux --sort=-%mem | head -n 6 >> $LOG_FILE\n\n# Check network connections\necho -e \"\\n--- Active Network Connections ---\" >> $LOG_FILE\nnetstat -tuln | head -n 20 >> $LOG_FILE\n"
+    }, {
+      "configuration" : {
+        "customModelName" : "phi",
+        "logFilterOutput" : "${data.logoutput}",
+        "maxTokens" : "1000",
+        "ollamaModel" : "phi3",
+        "ollamaServerUrl" : "http://localhost:11434",
+        "prompt" : "Simplify this\n\nCategorize as problematic, needs configuration or running well. Use emojis\n\nif something is wrong, please highlight resolution steps",
+        "temperature" : "0.7",
+        "topP" : "1.0"
+      },
+      "description" : "Simplify with Ollama",
+      "nodeStep" : true,
+      "type" : "ollamaai-plugin"
+    } ],
+    "keepgoing" : false,
+    "strategy" : "node-first"
+  },
+  "uuid" : "e219e8ef-167f-4905-b0d5-50f0aa73dbb1"
+} ]
 ```
 
 ### Response Format

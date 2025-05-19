@@ -1,0 +1,93 @@
+plugins {
+    id 'groovy'
+    id 'java'
+}
+
+version = '0.1.0'
+defaultTasks 'clean','build'
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+sourceCompatibility = 11.0
+ext.rundeckPluginVersion= '2.0'
+ext.rundeckVersion= '5.0.2-20240212'
+ext.pluginClassNames='com.plugin.ollamaai.OllamaAIPlugin'
+
+// Groovy configuration
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src/main/groovy']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+    test {
+        groovy {
+            srcDirs = ['src/test/groovy']
+        }
+    }
+}
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+// Add explicit Groovy dependency
+configurations {
+    groovy
+}
+
+configurations{
+    //declare custom pluginLibs configuration to include only libs for this plugin
+    pluginLibs
+
+    //declare compile to extend from pluginLibs so it inherits the dependencies
+    implementation{
+        extendsFrom pluginLibs
+    }
+}
+
+dependencies {
+    implementation 'org.rundeck:rundeck-core:5.0.2-20240212'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.9'
+
+    // We're not using okhttp anymore to avoid Kotlin dependency issues
+    // Instead using standard Java HttpURLConnection
+    pluginLibs group: 'org.json', name: 'json', version: '20230227'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.codehaus.groovy:groovy-all:3.0.9"
+    testImplementation "org.spockframework:spock-core:2.2-groovy-3.0"
+}
+
+// task to copy plugin libs to output/lib dir
+task copyToLib(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.pluginLibs
+}
+
+jar {
+    from "$buildDir/output"
+    manifest {
+        def libList = configurations.pluginLibs.collect{'lib/'+it.name}.join(' ')
+
+        attributes 'Rundeck-Plugin-Classnames': pluginClassNames
+        attributes 'Rundeck-Plugin-File-Version': version
+        attributes 'Rundeck-Plugin-Name': 'ollamaai'
+        attributes 'Rundeck-Plugin-Description': 'Workflow step plugin that sends prompts to Ollama and Claude AI models for processing.'
+        attributes 'Rundeck-Plugin-Rundeck-Compatibility-Version': '3.x'
+        attributes 'Rundeck-Plugin-Tags': 'groovy,workflow,ai,ollama,claude'
+        attributes 'Rundeck-Plugin-License': 'Apache 2.0'
+        attributes 'Rundeck-Plugin-Source-Link': 'https://github.com/yourusername/rundeck-ollama-plugin'
+        attributes 'Rundeck-Plugin-Target-Host-Compatibility': 'all'
+        attributes 'Rundeck-Plugin-Version': rundeckPluginVersion
+        attributes 'Rundeck-Plugin-Archive': 'true'
+        attributes 'Rundeck-Plugin-Libs': "${libList}"
+
+    }
+    dependsOn(copyToLib)
+}

@@ -33,7 +33,7 @@
 1. Install Ollama on your Linux system:
 
 ``` bash
-curl -fsSL [https://ollama.com/install.sh](https://ollama.com/install.sh) | sh
+curl -fsSL https://ollama.com/install.sh | sh
 ```
 
 2. Start the Ollama service:

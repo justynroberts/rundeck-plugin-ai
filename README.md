@@ -118,11 +118,7 @@ By default, the plugin connects to `[http://localhost:11434](http://localhost:11
   "name" : "Testing Local LLM (Ollama) Simplification of Logs",
   "nodeFilterEditable" : false,
   "plugins" : {
-    "ExecutionLifecycle" : {
-      "roi-metrics" : {
-        "userRoiData" : "[{\"key\":\"hours\",\"label\":\"hours\",\"value\":\"0.75\",\"desc\":\"hours saved (Field key: hours)\"}]"
-      }
-    }
+    "ExecutionLifecycle" : { }
   },
   "scheduleEnabled" : true,
   "schedules" : [ ],

@@ -88,7 +88,7 @@ sudo systemctl restart rundeckd
 
 ### Ollama Server Setup
 
-By default, the plugin connects to `[http://localhost:11434](http://localhost:11434)`. You can configure a different server URL in the workflow step configuration.
+By default, the plugin connects to `http://localhost:11434`. You can configure a different server URL in the workflow step configuration.
 
 ### Requirements
 
@@ -197,7 +197,7 @@ ${data.ollamaai.model}
 | --------- | ----------- | ------- |
 | `Ollama Model` | The Ollama model to use | `llama3` |
 | `Custom Model Name` | Name of custom model | - |
-| `Ollama Server URL` | Server URL | `[http://localhost:11434](http://localhost:11434)` |
+| `Ollama Server URL` | Server URL | `http://localhost:11434` |
 | `Prompt` | AI prompt | - |
 | `Temperature` | Randomness (0.0-1.0) | `0.7` |
 | `Max Tokens` | Token generation limit | `1000` |

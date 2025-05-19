@@ -1,4 +1,4 @@
-# 🤖 OllamaAI Plugin for Rundeck
+# 🤖 Rundeck Plugin - Ollama Workflow step
 
 > A workflow step plugin that integrates [Ollama](https://ollama.ai) AI models with Rundeck for intelligent automation and analysis. **This plugin is community supported**
 > [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
